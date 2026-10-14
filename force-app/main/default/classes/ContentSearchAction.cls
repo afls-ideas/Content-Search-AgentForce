@@ -14,6 +14,8 @@ public with sharing class ContentSearchAction {
         public String matches;
         @InvocableVariable(label='Match Count' description='Number of matching slides')
         public Integer matchCount;
+        @InvocableVariable(label='First Page Id' description='Id of the best matching slide, empty when there are no matches')
+        public String firstPageId;
     }
 
     @InvocableMethod(label='Search Presentation Slides' description='Searches the text of presentation slides with Data 360 hybrid search and returns the slides that best match a topic' callout=true)
@@ -81,6 +83,9 @@ public with sharing class ContentSearchAction {
             PresentationPage pg = pages.get(pageId);
             if (pg == null) {
                 continue;
+            }
+            if (lines.isEmpty()) {
+                res.firstPageId = pg.Id;
             }
             String line = (lines.size() + 1) + '. ' + pg.Name + ' (Id: ' + pg.Id
                 + ', relevance: ' + bestScore.get(pageId).setScale(2) + ')';

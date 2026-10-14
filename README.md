@@ -61,7 +61,7 @@ slide-level link or OCR of text inside images).
 | `presentationRecommendationCLT` | `lightningTypes/` | Custom Lightning Type; desktop and mobile renderers point at the LWC |
 | `presentationRecommendationLWC` | `lwc/` | Renders thumbnail + slide name / deck / slide #; web reads `value`, mobile reads `c__*` page-ref state |
 | Permission set | `permissionsets/Content_Recommendation_Agent_Access` | Apex class access (and field access for `Extracted_Text__c`) |
-| Test harness | `run_agent_tests.py` -> `agent_test_results.md` (generated locally, git-ignored because it contains record Ids) | 17 utterances against the live agent, strict pass/fail |
+| Test harness | `run_agent_tests.py` -> `agent_test_results.md` (generated locally, git-ignored because it contains record Ids) | 18 utterances against the live agent, strict pass/fail |
 | Setup notes | `docs/immunexis_hybrid_search_setup.html` | How the slide text and index were built and validated |
 
 ## Agent design (`Content_Recommendation_Agent.agent`)
@@ -77,14 +77,13 @@ flowchart TD
         direction TB
         B["before_reasoning (deterministic):<br/>run search_slides with the user's exact message<br/>-> variable search_results"]
         B --> L["LLM writes the answer from the excerpts only<br/>(no 'may / likely / possibly')"]
-        L --> D{How many slides<br/>answer the question?}
-        D -->|exactly one| SH["call show_slide immediately<br/>(no 'would you like to see it?')"]
-        D -->|several| LS["list them, ask which to show"]
+        L --> D{Which slides<br/>answer the question?}
+        D -->|one or more| LS["answer, name the slide(s),<br/>ask 'Would you like to see it?'<br/>(never displays a slide)"]
         D -->|none| NF["say not found, offer rewording"]
     end
 
     subgraph V["topic: slide_viewer"]
-        V1["use stored search_results<br/>('the first slide' = first entry)"] --> V2["call show_slide"]
+        V1["first_page_id (set by the search action)"] --> V2["LLM calls show_slide once"] --> V3["LLM calls __show_tool_results__<br/>so the card reaches the client"]
     end
 ```
 
@@ -100,8 +99,12 @@ Design decisions and why:
   recommends a slide whose excerpt actually contains the answer.
 - **`slide_viewer` is a separate topic** so "show me the first slide" doesn't re-run the search with that sentence and
   overwrite the previous results.
-- **Single-answer = show it.** If exactly one slide answers, the agent displays it without asking.
-- The `slide` output is `filter_from_agent: True` (see *Thumbnail delivery* below).
+- **Show only on confirmation.** `slide_search` never displays a slide; it answers and asks. "yes / show it" routes to
+  `slide_viewer`, which shows the top match (`first_page_id`, returned by `search_slides` as `firstPageId`). This avoids
+  loading thumbnails nobody asked for.
+- **The card needs two tool calls.** Running `show_slide` from `before_reasoning` (or without the model then calling
+  `__show_tool_results__`) returns an empty `result` and no card is rendered. `slide_viewer` therefore tells the model to
+  call `show_slide` once, then `__show_tool_results__` once, then stop (earlier versions looped on `show_slide`).
 
 ## Runtime flow
 
@@ -118,13 +121,14 @@ sequenceDiagram
     A->>S: topic = user's exact message (forced in before_reasoning)
     S->>I: hybrid_search(index, topic, 20 candidates) JOIN chunk table
     I-->>S: rows (score, SourceRecordId, chunk, source field)
-    S->>S: keep ExtractedText__c rows only, best score per page, top 3,<br/>excerpt up to 1500 chars; look up page names
+    S->>S: keep ExtractedText__c rows only, best score per page, top 3,<br/>excerpt up to 1500 chars, then look up page names
     S-->>A: "1. Immunexis Dosing (Id: 1IBg..., relevance 0.51) - <text>"
-    A->>A: LLM reads excerpts: exactly one slide answers
-    A->>H: show_slide(pageId)
-    H-->>A: slide{name, deck, #, thumbnail data URI}
+    A-->>U: quoted answer + "Would you like to see the slide?"
+    U->>A: "yes"
+    A->>H: show_slide(first_page_id)
+    H-->>A: slide{name, deck, #, thumbnail URL}
     A-->>C: reply text + slide card (copilotActionOutput)
-    C-->>U: quoted answer + slide image
+    C-->>U: slide image
 ```
 
 ### Search action details (`ContentSearchAction`)
@@ -139,13 +143,10 @@ sequenceDiagram
 
 ### Thumbnail delivery (`ShowSlideAction`)
 
-- The thumbnail JPG linked to the `PresentationPage` is returned as a **base64 `data:` URI** (if <= 400 KB; otherwise it
-  falls back to `/sfc/servlet.shepherd/version/renditionDownload?...`).
-- Why: the relative `/sfc/...` URL works in a browser but renders as a broken image in the iPad app, which has no org host
-  or session cookie for the image request.
-- Because that string is ~63 KB, the action output is hidden from the model (`filter_from_agent: True`); otherwise the
-  model prompt grew from ~27K to ~150K characters. The card still reaches the client in the response's
-  `copilotActionOutput` payload.
+- Returns an absolute URL `<org domain>/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=...`.
+  A relative URL has no host in the iPad app. A base64 data URI was tried but produced a ~63 KB payload and a ~150K
+  character model prompt, so it was dropped.
+- Not yet confirmed on the iPad: the image may still need a session cookie or a public ContentDistribution link.
 
 ## Data model and indexing (done outside this repo's runtime)
 
@@ -163,8 +164,7 @@ before it becomes searchable. See `docs/immunexis_hybrid_search_setup.html`, `im
 
 `presentationRecommendationLWC` supports both data paths: on web the platform sets the `@api value`; in the mobile app the
 data arrives as `lightning/navigation` page-reference state params (`c__slideName`, `c__thumbnailUrl`, ...) and is only
-accepted when `c__channel === 'Mobile'`. The inline data-URI thumbnail works on both. If the image is blank on iPad with a
-data URI, check whether the app blocks `data:` images.
+accepted when `c__channel === 'Mobile'`. If the thumbnail is blank on iPad, the absolute URL may need authentication the app does not send.
 
 ## Deploy and test
 
@@ -187,10 +187,10 @@ Notes:
 
 ### What the tests check (`run_agent_tests.py`)
 
-17 utterances across dosing, efficacy, safety, overview, patient support, multi-turn "show me the first slide", content
+18 utterances across dosing, efficacy, safety, overview, patient support, multi-turn "show me the first slide", content
 not in the deck, no-match and off-topic. A case passes only if the expected action was called in the final turn, the
 **expected slide is the first one named (or the one actually shown)**, the reply doesn't hedge (`may`, `likely`,
-`possibly`), and single-answer cases show the slide without asking for confirmation.
+`possibly`), and search cases ask before showing and never call `show_slide`.
 
 ## Known limitations
 
@@ -199,5 +199,5 @@ not in the deck, no-match and off-topic. A case passes only if the expected acti
 - **Only the Immunexis deck is covered by tests.** The org holds other presentations; a statin test slide
   (one of the extra test pages loaded into the org) is not returned and may not be indexed.
 - **Slides without extracted text are not findable** (name-only matches are intentionally ignored).
-- Thumbnails over 400 KB fall back to the relative URL and will not render on iPad.
+- iPad thumbnail rendering and the earlier iPad hang are unverified on the device.
 - The agent answers conversationally, so exact wording varies run to run.

@@ -20,18 +20,19 @@ def trace_calls(sid, n_before):
 # (id, category, turns[list of utterances], expected substrings (any) in final reply, expected action in last turn, forbidden substrings)
 CASES = [
  ("T01","Dosing (slide-style)",["Which slide talks about the maintenance dose?"],["Immunexis Dosing"],"search_slides",[]),
- ("T02","Dosing (user report)",["where should I administer the drug?"],["Immunexis Dosing"],"show_slide",["could not find","did not find"]),
+ ("T02","Dosing (user report)",["where should I administer the drug?"],["Immunexis Dosing"],"search_only",["could not find","did not find"]),
  ("T03","Dosing",["What is the loading dose?"],["Immunexis Dosing"],"search_slides",[]),
- ("T04","Dosing",["how should the medication be stored?"],["Immunexis Dosing"],"show_slide",[]),
+ ("T04","Dosing",["how should the medication be stored?"],["Immunexis Dosing"],"search_only",[]),
  ("T05","Dosing",["can patients inject at home?"],["Immunexis Dosing"],"search_slides",[]),
  ("T06","Efficacy",["Which slide shows the clinical remission rate?"],["Immunexis Efficacy"],"search_slides",[]),
  ("T07","Efficacy",["how fast does it start working?"],["Immunexis Efficacy"],"search_slides",[]),
  ("T08","Safety",["what are the side effects?"],["Immunexis Safety"],"search_slides",[]),
  ("T09","Safety",["injection site reaction rates compared to placebo"],["Immunexis Safety"],"search_slides",[]),
  ("T10","Overview",["how does the drug work? mechanism of action"],["Immunexis Overview"],"search_slides",[]),
- ("T11","Patient support",["is there a co-pay savings card for patients?"],["Immunexis Resources"],"show_slide",[]),
+ ("T11","Patient support",["is there a co-pay savings card for patients?"],["Immunexis Resources"],"search_only",[]),
  ("T12","Patient support",["Where do I find prescribing information?"],["Immunexis Resources"],"search_slides",[]),
  ("T13","Show slide (multi-turn)",["Which slide talks about the maintenance dose?","show me the first slide"],["Dosing"],"show_slide",[]),
+ ("T18","Confirm then show (multi-turn)",["where should I administer the drug?","yes"],["Immunexis Dosing"],"show_slide",[]),
  ("T14","Non-Immunexis content",["which slide covers statins and LDL cholesterol?"],[],"search_slides",[]),
  ("T15","No match",["which slide talks about the migration patterns of arctic terns?"],["no matching","couldn't find","could not find","did not find","no slides","not find"],"search_slides",[]),
  ("T16","Off-topic",["what's the weather in London today?"],["only help","presentation","slide"],None,[]),
@@ -48,7 +49,10 @@ def run(case):
     try: sf("end", "--session-id", sid)
     except RuntimeError: pass   # cleanup only
     names = [c[0] for c in calls]
-    ok_act = (act in names) if act else not names
+    if act == "search_only":   # must search and must NOT display a slide before the user confirms
+        ok_act = "search_slides" in names and "show_slide" not in names
+    else:
+        ok_act = (act in names) if act else not names
     low = reply.lower()
     SLIDES = ["immunexis overview", "immunexis efficacy", "immunexis safety", "immunexis dosing", "immunexis resources"]
     import re
@@ -61,6 +65,7 @@ def run(case):
         ok_exp = bool(pos) and min(pos, key=pos.get) == exp[0].lower()
     else:
         ok_exp = (not exp) or any(e.lower() in low for e in exp)
+    if act == "search_only": ok_exp = ok_exp and ("?" in reply)
     ok_forbid = not any(f in low for f in forbid + [" may ", "likely", "possibly", "might "] + (["see this slide", "view this slide", "show this slide", "like to see", "like me to show"] if act == "show_slide" else []))
     status = "PASS" if (ok_act and ok_exp and ok_forbid) else "FAIL"
     print(cid, status, names, flush=True)
