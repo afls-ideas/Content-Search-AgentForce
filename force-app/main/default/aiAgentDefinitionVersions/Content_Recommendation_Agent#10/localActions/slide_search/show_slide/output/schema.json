@@ -1,0 +1,22 @@
+{
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "slide" : {
+      "title" : "Slide",
+      "description" : "The slide card with its thumbnail. The output is always renderable; always use show_command to display it to the user.",
+      "lightning:type" : "c__presentationRecommendationCLT",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : true,
+      "copilotAction:isUsedByPlanner" : false
+    },
+    "summary" : {
+      "title" : "Summary",
+      "description" : "Plain-text summary of the slide shown",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

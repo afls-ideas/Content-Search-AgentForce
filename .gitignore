@@ -1,0 +1,14 @@
+# Agent preview sessions/traces (contain org and record Ids)
+.sfdx/
+.sf/
+
+# Files with org URLs / record Ids
+presentation_pages.md
+uploaded.json
+test_pages.json
+
+# Generated test output (contains record Ids)
+agent_test_results.md
+
+.DS_Store
+__pycache__/

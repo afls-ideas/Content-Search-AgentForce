@@ -1,0 +1,32 @@
+<template>
+    <div class="component-root">
+        <template if:true={hasData}>
+            <template if:true={hasThumbnail}>
+                <img src={thumbnailUrl} alt={slideName} class="thumbnail" />
+            </template>
+            <template if:false={hasThumbnail}>
+                <div class="thumbnail-placeholder slds-text-align_center">No thumbnail available</div>
+            </template>
+            <div class="header">
+                <h3 class="slide-name">{slideName}</h3>
+            </div>
+            <dl class="details">
+                <template if:true={presentationName}>
+                    <dt>Presentation</dt>
+                    <dd>{presentationName}</dd>
+                </template>
+                <template if:true={pageNumber}>
+                    <dt>Slide #</dt>
+                    <dd>{pageNumber}</dd>
+                </template>
+                <template if:true={matchReason}>
+                    <dt>Why Recommended</dt>
+                    <dd>{matchReason}</dd>
+                </template>
+            </dl>
+        </template>
+        <template if:false={hasData}>
+            <div class="no-data slds-text-align_center">No matching presentation slide available.</div>
+        </template>
+    </div>
+</template>

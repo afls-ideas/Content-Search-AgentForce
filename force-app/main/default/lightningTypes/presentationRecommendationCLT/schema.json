@@ -1,0 +1,5 @@
+{
+  "title" : "Presentation Slide Recommendation",
+  "description" : "Life Sciences example: recommends the best-matching real active presentation slide for a topic, queried live from Presentation/PresentationPage, and displays its thumbnail image.",
+  "lightning:type" : "@apexClassType/c__PresentationRecommendationWrapper"
+}

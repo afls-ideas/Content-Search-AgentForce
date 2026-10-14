@@ -1,0 +1,53 @@
+.component-root {
+    padding: 0.75rem 1rem;
+}
+
+.thumbnail {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    background-color: #f3f2f2;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.thumbnail-placeholder {
+    background-color: #f3f2f2;
+    color: #706e6b;
+    border-radius: 0.5rem;
+    padding: 2rem 0;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.header {
+    margin-bottom: 0.5rem;
+}
+
+.slide-name {
+    font-weight: 700;
+    margin: 0;
+}
+
+.details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.75rem;
+    margin: 0;
+}
+
+.details dt {
+    color: #706e6b;
+    font-size: 0.8rem;
+}
+
+.details dd {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.no-data {
+    color: #706e6b;
+    padding: 0.5rem 0;
+}

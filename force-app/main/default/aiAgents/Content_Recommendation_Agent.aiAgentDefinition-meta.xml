@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentDSLEnabled>true</agentDSLEnabled>
+    <agentDescription>Employee agent that recommends presentation slides by searching slide text with a Data 360 hybrid search index</agentDescription>
+    <agentType>AgentforceEmployeeAgent</agentType>
+    <logPrivateConversationData>false</logPrivateConversationData>
+    <richContentEnabled>true</richContentEnabled>
+    <type>InternalCopilot</type>
+</AiAgentDefinition>

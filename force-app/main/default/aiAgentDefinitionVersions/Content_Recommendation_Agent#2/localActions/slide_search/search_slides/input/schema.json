@@ -1,0 +1,14 @@
+{
+  "required" : [ "topic" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "topic" : {
+      "title" : "Topic",
+      "description" : "The topic, question or keywords to find in the slides, in the user's own words",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

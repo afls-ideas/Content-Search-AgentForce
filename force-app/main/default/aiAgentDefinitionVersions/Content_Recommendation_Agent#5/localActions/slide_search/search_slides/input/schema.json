@@ -1,0 +1,14 @@
+{
+  "required" : [ "topic" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "topic" : {
+      "title" : "Topic",
+      "description" : "A short, specific search query containing the key terms of the user's question. Replace generic words such as the drug, the product or the medication with Immunexis",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

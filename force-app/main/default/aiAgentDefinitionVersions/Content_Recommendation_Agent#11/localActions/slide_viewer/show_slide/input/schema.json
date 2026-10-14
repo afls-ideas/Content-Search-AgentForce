@@ -1,0 +1,14 @@
+{
+  "required" : [ "pageId" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "pageId" : {
+      "title" : "Page Id",
+      "description" : "The Id of the slide to show, copied from the Id in the search results",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

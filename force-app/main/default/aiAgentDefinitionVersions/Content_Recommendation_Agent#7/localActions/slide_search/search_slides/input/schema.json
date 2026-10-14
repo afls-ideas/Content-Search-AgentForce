@@ -1,0 +1,14 @@
+{
+  "required" : [ "topic" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "topic" : {
+      "title" : "Topic",
+      "description" : "The user's full message, copied exactly as written, without shortening or rephrasing",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

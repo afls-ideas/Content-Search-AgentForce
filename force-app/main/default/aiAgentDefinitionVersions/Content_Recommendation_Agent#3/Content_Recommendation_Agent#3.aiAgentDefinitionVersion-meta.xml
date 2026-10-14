@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>Content_Recommendation_Agent_v3</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>Content_Recommendation_Agent_v3</fullName>
+        <agentGraphRef>20ZgL00000Ayka5</agentGraphRef>
+        <description>Employee agent that recommends presentation slides by searching slide text with a Data 360 hybrid search index</description>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>slide_search</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Route the user to the appropriate topic</description>
+            <genAiPluginInstructions>
+                <description>You are the Content Recommendation Agent, an AI assistant that helps users find the presentation slides that cover a topic.
+You are an AI assistant, not a human.
+Only recommend slides returned by the Search Presentation Slides action. Never invent slide names or content.</description>
+                <developerName>instruction0_179gL000002uINh</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002uINh</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Handle requests unrelated to finding presentation content</description>
+            <genAiPluginInstructions>
+                <description>You are the Content Recommendation Agent, an AI assistant that helps users find the presentation slides that cover a topic.
+You are an AI assistant, not a human.
+Only recommend slides returned by the Search Presentation Slides action. Never invent slide names or content.</description>
+                <developerName>instruction0_179gL000002uINi</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002uINi</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Find the presentation slides that contain a topic by searching slide text</description>
+            <genAiPluginInstructions>
+                <description>You are the Content Recommendation Agent, an AI assistant that helps users find the presentation slides that cover a topic.
+You are an AI assistant, not a human.
+Only recommend slides returned by the Search Presentation Slides action. Never invent slide names or content.</description>
+                <developerName>instruction0_179gL000002uINj</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002uINj</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>search_slides</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>show_slide</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Searches presentation slide text with hybrid (keyword and semantic) search and returns the best matching slides.</description>
+                <invocationTarget>ContentSearchAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>search_slides</localDeveloperName>
+                <masterLabel>Search Presentation Slides</masterLabel>
+                <progressIndicatorMessage>Searching presentation slides...</progressIndicatorMessage>
+            </localActions>
+            <localActions>
+                <description>Shows a presentation slide and its thumbnail image inline in the chat. The output is always renderable; always use show_command to display it to the user.</description>
+                <invocationTarget>ShowSlideAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>show_slide</localDeveloperName>
+                <masterLabel>Show Presentation Slide</masterLabel>
+                <progressIndicatorMessage>Loading the slide...</progressIndicatorMessage>
+            </localActions>
+            <localDeveloperName>slide_search</localDeveloperName>
+            <masterLabel>Slide Search</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>Content Recommendation Agent</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>3</version>
+    <welcomeMessage>Hi! I&apos;m the Content Recommendation Agent. Ask me which presentation slide covers a topic, like &apos;which slide talks about maintenance dosing?&apos;</welcomeMessage>
+</AiAgentDefinitionVersion>
