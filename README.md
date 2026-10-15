@@ -6,6 +6,8 @@ contains the answer and showing it inline** (thumbnail card) in the chat, on web
 > "Where should I administer the drug?" -> quotes *"Administration Sites: Upper arm, thigh, or abdomen"* and shows the
 > **Immunexis Dosing** slide.
 
+![Content Recommendation Agent demo](docs/content_agent_demo.gif)
+
 Slides in this org are images inside zip files, so there is no text for search to index. The solution turns each slide into
 text **outside** this system (manual step), indexes that text with Data 360 hybrid search, and uses a thin agent + two Apex
 actions to search, answer from the matched text, and render the slide.
