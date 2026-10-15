@@ -104,7 +104,7 @@ Design decisions and why:
   loading thumbnails nobody asked for.
 - **The card needs two tool calls.** Running `show_slide` from `before_reasoning` (or without the model then calling
   `__show_tool_results__`) returns an empty `result` and no card is rendered. `slide_viewer` therefore tells the model to
-  call `show_slide` once, then `__show_tool_results__` once, then stop (earlier versions looped on `show_slide`).
+  call `show_slide` once, then `__show_tool_results__` once, then stop. A `slide_summary` variable guards the action (`available when slide_summary == ""`, reset in `before_reasoning`); without it the model re-called `show_slide` ~48 times from the second confirmation onward, the prompt grew to 150K+ characters and the iPad stuck on "Loading the slide…".
 
 ## Runtime flow
 

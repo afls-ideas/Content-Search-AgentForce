@@ -24,6 +24,9 @@ variables:
     search_results: mutable string = ""
         description: "Result of the most recent slide search, one slide per line with its Id and text excerpt"
 
+    slide_summary: mutable string = ""
+        description: "Summary of the slide shown in the current turn; empty until show_slide has run. Guards against repeated show_slide calls"
+
 start_agent agent_router:
     description: "Route the user to the appropriate topic"
     reasoning:
@@ -87,6 +90,9 @@ topic slide_search:
 topic slide_viewer:
     description: "Show a slide that was already recommended, with its thumbnail"
 
+    before_reasoning:
+        set @variables.slide_summary = ""
+
     reasoning:
         instructions: ->
             | The user confirmed they want to see the slide that was just recommended.
@@ -96,6 +102,8 @@ topic slide_viewer:
             | If no slide was found earlier, do not call the action; ask the user what topic to search for.
         actions:
             show_slide: @actions.show_slide
+                available when @variables.slide_summary == ""
+                set @variables.slide_summary = @outputs.summary
 
     actions:
         show_slide:
