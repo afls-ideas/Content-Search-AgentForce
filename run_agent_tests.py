@@ -1,5 +1,5 @@
 import json, subprocess, os, glob, datetime
-O, N = "262-lsdo-july", "Content_Recommendation_Agent"
+O, N = os.environ["SF_ORG"], "Content_Recommendation_Agent"  # org alias via SF_ORG
 env = dict(os.environ, SFDX_DISABLE_DNS_CHECK="true")
 def sf(*a):
     for attempt in range(3):   # transient CLI/session errors happen under parallel load

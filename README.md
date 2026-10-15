@@ -170,14 +170,14 @@ accepted when `c__channel === 'Mobile'`. If the thumbnail is blank on iPad, the 
 
 ```bash
 export SFDX_DISABLE_DNS_CHECK=true          # needed if the My Domain DNS check times out
-ORG=262-lsdo-july                            # the org that holds the Immunexis content
+ORG=<your-org-alias>                      # the org that holds the Immunexis content
 
 sf project deploy start -o $ORG -d force-app/main/default/classes          # Apex
 sf agent validate authoring-bundle -o $ORG -n Content_Recommendation_Agent
 sf agent publish  authoring-bundle -o $ORG -n Content_Recommendation_Agent  # creates a new version (inactive)
 sf agent activate -o $ORG -n Content_Recommendation_Agent --version <n>     # make it live
 
-python3 run_agent_tests.py                   # ~10 min; writes agent_test_results.md
+SF_ORG=$ORG python3 run_agent_tests.py                   # ~10 min; writes agent_test_results.md
 ```
 
 Notes:
